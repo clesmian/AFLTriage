@@ -5,7 +5,6 @@
 use serde::{Deserialize, Serialize};
 use regex::Regex;
 use std::collections::HashMap;
-use std::array::IntoIter;
 use std::iter::FromIterator;
 
 lazy_static! {
@@ -20,7 +19,7 @@ lazy_static! {
     .unwrap();
     static ref R_SANITIZER_REPORT_FRAME: Regex = Regex::new(r#"#(?P<num>[0-9]+)\s+(?P<addr>0x[a-fA-F0-9]+)"#).unwrap();
 
-    static ref SANITIZER_SHORT: HashMap<&'static str, &'static str> = HashMap::<_, _>::from_iter(IntoIter::new([
+    static ref SANITIZER_SHORT: HashMap<&'static str, &'static str> = HashMap::<_, _>::from_iter(IntoIterator::into_iter([
             ("AddressSanitizer", "ASAN"),
     ]));
 }
