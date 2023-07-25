@@ -897,6 +897,7 @@ fn main_wrapper() -> i32 {
 
     let test_bucket_out_dir = output_dir.as_ref().unwrap();
     let _ = OpenOptions::new()
+        .write(true)
         .truncate(true)
         .create(true)
         .open(test_bucket_out_dir.join("test_cases_summary.txt"))
