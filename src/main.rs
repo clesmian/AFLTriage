@@ -48,6 +48,8 @@ use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
 use std::env;
+use std::fs::OpenOptions;
+use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -619,7 +621,6 @@ fn collect_input_testcases(processed_inputs: &mut Vec<UserInputPath>) -> Vec<Tes
 fn init_logger() {
     use env_logger::{fmt::Color, Builder, Env, Target};
     use log::{Level, LevelFilter};
-    use std::io::Write;
 
     let env = Env::default();
 
@@ -894,6 +895,15 @@ fn main_wrapper() -> i32 {
         show_child_output: child_output,
     };
 
+    let test_bucket_out_dir = output_dir.as_ref().unwrap();
+    let _ = OpenOptions::new()
+        .truncate(true)
+        .create(true)
+        .open(test_bucket_out_dir.join("test_cases_summary.txt"))
+        .expect("cannot open file")
+        .write("path : bucket\n".as_bytes())
+        .expect("write failed");
+
     all_testcases.par_iter().panic_fuse().for_each(|testcase| {
         if stop_requested.load(Ordering::Relaxed) {
             if display_progress {
@@ -940,6 +950,19 @@ fn main_wrapper() -> i32 {
                 } else {
                     bucket_info.strategy_result.to_string()
                 };
+
+                let test_bucket_out_dir = output_dir.as_ref().unwrap();
+
+                let test_bucket_res = format!("{} : {}\n", path.to_string(), bucket.to_string());
+
+                let _ = OpenOptions::new()
+                    .append(true)
+                    .create(true)
+                    .open(test_bucket_out_dir.join("test_cases_summary.txt"))
+                    .expect("cannot open file")
+                    .write(test_bucket_res.as_bytes())
+                    .expect("write failed");
+
 
                 if !state.crash_signature.contains(&bucket) {
                     state.crash_signature.insert(bucket.to_string());
