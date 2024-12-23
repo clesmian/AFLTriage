@@ -488,6 +488,14 @@ fn collect_afl_crashes_from_dir(path: &Path) -> Option<AflDirInfo> {
                     if tc.file_name().unwrap() == "README.txt" {
                         continue;
                     }
+                    
+                    // Skip LibAFL metadata and lock files
+                    if tc.file_name().unwrap().to_str().unwrap().ends_with(".metadata") {
+                        continue;
+                    }
+                    if tc.file_name().unwrap().to_str().unwrap().ends_with(".lafl_lock") {
+                        continue;
+                    }
 
                     testcases.push(Testcase {
                         unique_id: "".to_string(),
